@@ -1,0 +1,7 @@
+greeting:
+  message: "hello"
+
+quarkus:
+  datasource:
+    jdbc.url: jdbc:postgresql://localhost:5432/employee
+    ssl: false
