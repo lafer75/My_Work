@@ -1,4 +1,4 @@
-package com.example.demo.filters;
+package com.example.Homework_1.filters;
 
 
 import jakarta.servlet.*;
@@ -32,10 +32,10 @@ public class AuthenticationFilter implements Filter {
         HttpSession session = req.getSession(false);
 
         if (session == null && !(
-                uri.endsWith("demo/saveServlet") ||
-                        uri.endsWith("demo/viewByIDServlet") ||
-                        uri.endsWith("demo/loginServlet") ||
-                        uri.endsWith("demo/viewServlet"))) {
+                uri.endsWith("Homework_1/saveServlet") ||
+                        uri.endsWith("Homework_1/viewByIDServlet") ||
+                        uri.endsWith("Homework_1/loginServlet") ||
+                        uri.endsWith("Homework_1/viewServlet"))) {
             this.context.log("<<< Unauthorized access request");
             PrintWriter out = res.getWriter();
             out.println("No access!!!");

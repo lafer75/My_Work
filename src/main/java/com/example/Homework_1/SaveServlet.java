@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.Homework_1;
 
 
 import jakarta.servlet.ServletException;
@@ -33,11 +33,14 @@ public class SaveServlet extends HttpServlet {
         int status = EmployeeRepository.save(employee);
         //out.println(status);
 
-        if (status > 0) {
-            out.print("Record saved successfully!");
-        } else {
-            out.println("Sorry! unable to save record");
-        }
+
+        String resultMessage = (status > 0) ?
+                "Success Alert: 🎉 Record for " + name + " saved successfully!" :
+                "Error Alert: 🚨 Oops! Unable to save the record for " + name + ". Please try again.";
+
+        // Send the result to Cat
+        System.out.println(resultMessage);
+
         out.close();
     }
 }

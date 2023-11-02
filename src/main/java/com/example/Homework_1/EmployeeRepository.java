@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.Homework_1;
 
 
 import java.sql.*;
@@ -8,18 +8,18 @@ import java.util.Optional;
 
 public final class EmployeeRepository {
 
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
         getConnection();
         Employee employee = new Employee("Takeshi", "takeshi.jp@jmail.jp", "Japan");
         save(employee);
-    }*/
+    }
 
     public static Connection getConnection() {
 
         Connection connection = null;
-        String url = "jdbc:postgresql://localhost:5432/employee";
+        String url = "jdbc:postgresql://localhost:5432/Java";
         String user = "postgres";
-        String password = "postgres";
+        String password = "24102007";
 
         try {
             connection = DriverManager.getConnection(url, user, password);
