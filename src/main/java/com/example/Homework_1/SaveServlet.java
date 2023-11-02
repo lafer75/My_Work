@@ -41,6 +41,7 @@ public class SaveServlet extends HttpServlet {
         // Send the result to Cat
         System.out.println(resultMessage);
 
+
         out.close();
     }
 }
