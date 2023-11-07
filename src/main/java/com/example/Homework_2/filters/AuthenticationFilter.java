@@ -1,5 +1,4 @@
-package com.example.Homework_1.filters;
-
+package com.example.Homework_2.filters;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
@@ -20,7 +19,8 @@ public class AuthenticationFilter implements Filter {
         this.context.log(">>> AuthenticationFilter initialized");
     }
 
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
@@ -31,11 +31,7 @@ public class AuthenticationFilter implements Filter {
 
         HttpSession session = req.getSession(false);
 
-        if (session == null && !(
-                uri.endsWith("Homework_1/saveServlet") ||
-                        uri.endsWith("Homework_1/viewByIDServlet") ||
-                        uri.endsWith("Homework_1/loginServlet") ||
-                        uri.endsWith("Homework_1/viewServlet"))) {
+        if (session == null && isUnauthorizedResource(uri)) {
             this.context.log("<<< Unauthorized access request");
             PrintWriter out = res.getWriter();
             out.println("No access!!!");
@@ -44,7 +40,14 @@ public class AuthenticationFilter implements Filter {
         }
     }
 
+    private boolean isUnauthorizedResource(String uri) {
+        return !(uri.endsWith("Homework_1/saveServlet") ||
+                uri.endsWith("Homework_1/viewByIDServlet") ||
+                uri.endsWith("Homework_1/loginServlet") ||
+                uri.endsWith("Homework_1/viewServlet"));
+    }
+
     public void destroy() {
-        //close any resources here
+        // close any resources here
     }
 }

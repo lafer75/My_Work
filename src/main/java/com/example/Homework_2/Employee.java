@@ -1,4 +1,4 @@
-package com.example.Homework_1;
+package com.example.Homework_2;
 
 public record Employee(int id, String name, String email, String country) {
     public Employee(String name, String email, String country) {
