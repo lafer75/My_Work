@@ -34,10 +34,21 @@ public class EmployeeServiceBean implements EmployeeService {
     }
 
     @Override
-    public List<Employee> findAllFromFrance() {
-            return employeeRepository.findAllFromFrance();
+    public int countEmployeesFromFranceJPQL() {
+        return (int) employeeRepository.findAllFromFranceJPQL().stream()
+                .filter(employee -> !employee.getIs_Deleted())
+                .count();
     }
 
+    @Override
+    public List<Employee> findAllFromFrance() {
+        return employeeRepository.findAllFromFrance();
+    }
+
+    @Override
+    public List<Employee> findAllFromFranceJPQL() {
+        return employeeRepository.findAllFromFranceJPQL();
+    }
     @Override
     @ActivateCustomAnnotations({Name.class, ToLowerCase.class})
     // @Transactional(propagation = Propagation.MANDATORY)
@@ -89,6 +100,7 @@ public class EmployeeServiceBean implements EmployeeService {
             return employee;
         }
     }
+
 
 
     public Employee updateById(Integer id, Employee employee) {
