@@ -48,6 +48,7 @@ public class RepositoryTests {
         Assertions.assertThat(employee.getName()).isEqualTo("Mark");
     }
 
+
     @Test
     @Order(2)
     @DisplayName("Get employee by id test")
@@ -114,6 +115,15 @@ public class RepositoryTests {
         }
 
         Assertions.assertThat(employeeNull).isNull();
+    }
+    @Test
+    @Order(7)
+    @DisplayName("Find all employees from France test")
+    public void findAllFromFranceTest() {
+
+        var employees = employeeRepository.findAllFromFrance();
+
+        Assertions.assertThat(employees.size()).isEqualTo(0);
     }
 
 }

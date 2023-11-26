@@ -3,6 +3,7 @@ package com.example.demowithtests;
 import com.example.demowithtests.domain.Employee;
 import com.example.demowithtests.dto.EmployeeDto;
 import com.example.demowithtests.dto.EmployeeReadDto;
+import com.example.demowithtests.dto.FranceGreetingDto;
 import com.example.demowithtests.service.EmployeeService;
 import com.example.demowithtests.service.EmployeeServiceEM;
 import com.example.demowithtests.util.mappers.EmployeeMapper;
@@ -11,6 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,24 +24,27 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +53,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = EmployeeController.class)
 @DisplayName("Employee Controller Tests")
 public class ControllerTests {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     ObjectMapper mapper;
@@ -58,8 +69,35 @@ public class ControllerTests {
     @MockBean
     EmployeeMapper employeeMapper;
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Test
+    @DisplayName("PATCH API -> /api/users/france")
+    @WithMockUser(roles = "ADMIN")
+    public void patchGreetEmployeesFromFranceTest() throws Exception {
+        // Mock the behavior of the employeeService.countEmployeesFromFrance() method
+        when(service.countEmployeesFromFrance()).thenReturn(547);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/users/france")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Happy holidays to users from France (PATCH)!"))
+                .andExpect(jsonPath("$.numberOfEmployees").value(547));
+    }
+
+    @Test
+    @DisplayName("PATCH API -> /api/users/france")
+    @WithMockUser(roles = "ADMIN")
+    public void putGreetEmployeesFromFranceTest() throws Exception {
+        // Mock the behavior of the employeeService.countEmployeesFromFrance() method
+        when(service.countEmployeesFromFrance()).thenReturn(547);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/users/france")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Happy holidays to users from France!"))
+                .andExpect(jsonPath("$.numberOfEmployees").value(547));
+    }
 
     @Test
     @DisplayName("POST API -> /api/users")
@@ -159,8 +197,7 @@ public class ControllerTests {
         when(service.updateById(eq(1), any(Employee.class))).thenReturn(employee);
         when(employeeMapper.toEmployeeReadDto(any(Employee.class))).thenReturn(response);
 
-        MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .put("/api/users/1")
+        MockHttpServletRequestBuilder mockRequest = put("/api/users/1")
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(employee));
@@ -177,16 +214,17 @@ public class ControllerTests {
     @WithMockUser(roles = "ADMIN")
     public void deletePassTest() throws Exception {
 
-        doNothing().when(service).removeById(1);
+        // Stub the removeById method to return null
+        when(service.removeById(2345)).thenReturn(null);
 
         MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders
-                .delete("/api/users/1")
+                .delete("/api/users/2345")
                 .with(csrf());
 
         mockMvc.perform(mockRequest)
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
-        verify(service).removeById(1);
+        verify(service).removeById(2345);
     }
 
     @Test

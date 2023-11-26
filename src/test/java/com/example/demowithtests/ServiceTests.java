@@ -12,12 +12,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -41,20 +45,31 @@ public class ServiceTests {
                 .builder()
                 .id(1)
                 .name("Mark")
-                .country("UK")
+                .country("France")
                 .email("test@mail.com")
                 .gender(Gender.M)
                 .build();
+
+
     }
+
 
     @Test
     @DisplayName("Save employee test")
     public void whenSaveEmployee_shouldReturnEmployee() {
 
-        when(employeeRepository.save(ArgumentMatchers.any(Employee.class))).thenReturn(employee);
-        var created = service.create(employee);
-        assertThat(created.getName()).isSameAs(employee.getName());
+        when(employeeRepository.save(employee)).thenReturn(employee);
+        Employee created = service.create(employee);
+        assertEquals(employee.getName(), created.getName());
         verify(employeeRepository).save(employee);
+    }
+
+    @Test
+    @DisplayName("Throw exception when employee not found test")
+    public void should_throw_exception_when_employee_doesnt_exist() {
+
+        when(employeeRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException());
+        assertThrows(ResourceNotFoundException.class, () -> employeeRepository.findById(anyInt()));
     }
 
     @Test
@@ -69,13 +84,8 @@ public class ServiceTests {
         verify(employeeRepository).findById(employee.getId());
     }
 
-    @Test
-    @DisplayName("Throw exception when employee not found test")
-    public void should_throw_exception_when_employee_doesnt_exist() {
 
-        when(employeeRepository.findById(anyInt())).thenThrow(ResourceNotFoundException.class);
-        assertThrows(ResourceNotFoundException.class, () -> employeeRepository.findById(anyInt()));
-    }
+
 
     @Test
     @DisplayName("Read employee by id test")
