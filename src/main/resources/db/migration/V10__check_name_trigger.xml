@@ -1,0 +1,24 @@
+<!-- db-changelog/V4__Add_lastname_constraint.xml -->
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.8.xsd">
+
+    <!-- Create a custom precondition for lastname not being "Putin" -->
+    <preConditions onFail="HALT">
+        <sqlCheck expectedResult="0">SELECT COUNT(*) FROM users WHERE lastname = 'Putin'</sqlCheck>
+    </preConditions>
+
+    <!-- Add a check constraint on lastname -->
+    <changeSet id="add_lastname_constraint" author="your_name">
+        <sql>
+            <![CDATA[
+            ALTER TABLE users
+                ADD CONSTRAINT check_lastname_not_putin CHECK (lastname <> 'Putin');
+            ]]>
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
