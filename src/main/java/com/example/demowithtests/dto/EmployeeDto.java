@@ -40,7 +40,10 @@ public record EmployeeDto(
         Gender gender,
 
         @Valid
-        Set<AddressDto> addresses) {
+        Set<AddressDto> addresses,
+
+        @Valid
+        DocumentDto document) {
 
     public EmployeeDto(Integer id,
                        String name,
@@ -48,7 +51,8 @@ public record EmployeeDto(
                        String email,
                        Date startDate,
                        Gender gender,
-                       Set<AddressDto> addresses) {
+                       Set<AddressDto> addresses,
+                       DocumentDto document) {
 
         this.id = id;
         this.name = name;
@@ -57,6 +61,6 @@ public record EmployeeDto(
         this.startDate = startDate != null ? startDate : Date.from(Instant.now());
         this.gender = gender;
         this.addresses = addresses != null ? addresses : new HashSet<>();
-
+        this.document = document;
     }
 }

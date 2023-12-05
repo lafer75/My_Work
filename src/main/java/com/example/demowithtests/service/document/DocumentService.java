@@ -7,6 +7,7 @@ public interface DocumentService {
     Document create(Document document);
 
     Document getById(Integer id);
+    Document delete(Integer id);
 
     Document handlePassport(Integer id);
 

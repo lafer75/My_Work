@@ -1,9 +1,12 @@
 package com.example.demowithtests.web;
 
+import com.example.demowithtests.domain.DocumentHistory;
 import com.example.demowithtests.domain.Employee;
 import com.example.demowithtests.dto.*;
+import com.example.demowithtests.repository.DocumentHistoryRepository;
 import com.example.demowithtests.service.EmployeeService;
 import com.example.demowithtests.service.EmployeeServiceEM;
+import com.example.demowithtests.service.document.DocumentServiceBean;
 import com.example.demowithtests.util.mappers.EmployeeMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +42,7 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final EmployeeServiceEM employeeServiceEM;
     private final EmployeeMapper employeeMapper;
+    private final DocumentHistoryRepository documentHistoryRepository;
 
     @PostMapping(USER_ENDPOINT)
     @ResponseStatus(HttpStatus.CREATED)
@@ -49,7 +55,16 @@ public class EmployeeController {
     public EmployeeDto saveEmployee(@RequestBody @Valid EmployeeDto requestForSave) {
         log.debug("saveEmployee() - start: requestForSave = {}", requestForSave.name());
         var employee = employeeMapper.toEmployee(requestForSave);
+        var createdEmployee = employeeService.create(employee);
+        DocumentHistory history = DocumentHistory.builder()
+                .timestamp(LocalDateTime.now())
+                .document(createdEmployee.getDocument())
+                .action("ADD")
+                .build();
+        documentHistoryRepository.save(history);
+
         var dto = employeeMapper.toEmployeeDto(employeeService.create(employee));
+
         log.debug("saveEmployee() - stop: dto = {}", dto.name());
         return dto;
     }

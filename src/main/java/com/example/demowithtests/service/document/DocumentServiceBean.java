@@ -1,6 +1,9 @@
 package com.example.demowithtests.service.document;
 
 import com.example.demowithtests.domain.Document;
+import com.example.demowithtests.domain.DocumentHistory;
+import com.example.demowithtests.dto.DocumentDto;
+import com.example.demowithtests.repository.DocumentHistoryRepository;
 import com.example.demowithtests.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +17,7 @@ import java.time.LocalDateTime;
 public class DocumentServiceBean implements DocumentService {
 
     private final DocumentRepository documentRepository;
+    private final DocumentHistoryRepository documentHistoryRepository;
 
     /**
      * @param document
@@ -22,7 +26,17 @@ public class DocumentServiceBean implements DocumentService {
     @Override
     public Document create(Document document) {
         document.setExpireDate(LocalDateTime.now().plusYears(5));
-        return documentRepository.save(document);
+        Document savedDocument = documentRepository.save(document);
+
+        // Update history for document creation
+        DocumentHistory history = DocumentHistory.builder()
+                .timestamp(LocalDateTime.now())
+                .document(savedDocument)
+                .action("ADD")
+                .build();
+        documentHistoryRepository.save(history);
+
+        return savedDocument;
     }
 
     /**
@@ -41,10 +55,20 @@ public class DocumentServiceBean implements DocumentService {
     @Override
     public Document handlePassport(Integer id) {
         Document document = getById(id);
+
         if (document.getIsHandled()) {
-            throw new RuntimeException();
-        } else document.setIsHandled(Boolean.TRUE);
-        return documentRepository.save(document);
+            throw new RuntimeException("Document has already been handled");
+        } else {
+            document.setIsHandled(Boolean.TRUE);
+            document = documentRepository.save(document);
+            DocumentHistory history = DocumentHistory.builder()
+                    .timestamp(LocalDateTime.now())
+                    .document(document)
+                    .action("HANDLE_PASSPORT")
+                    .build();
+            documentHistoryRepository.save(history);
+            return document;
+        }
     }
 
     /**
@@ -55,5 +79,20 @@ public class DocumentServiceBean implements DocumentService {
     @Override
     public Document addImage(Integer passportId, Integer imageId) {
         return null;
+    }
+
+    @Override
+    public Document delete(Integer id) {
+        Document document = getById(id);
+        documentRepository.delete(document);
+
+        // Update history for document deletion
+        DocumentHistory history = DocumentHistory.builder()
+                .timestamp(LocalDateTime.now())
+                .document(document)
+                .action("DELETE")
+                .build();
+        documentHistoryRepository.save(history);
+        return document;
     }
 }
