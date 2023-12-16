@@ -43,7 +43,9 @@ public record EmployeeDto(
         Set<AddressDto> addresses,
 
         @Valid
-        DocumentDto document) {
+        DocumentDto document,
+
+        UsersRoleDto usersRole) {
 
     public EmployeeDto(Integer id,
                        String name,
@@ -52,7 +54,8 @@ public record EmployeeDto(
                        Date startDate,
                        Gender gender,
                        Set<AddressDto> addresses,
-                       DocumentDto document) {
+                       DocumentDto document,
+                       UsersRoleDto usersRole) {
 
         this.id = id;
         this.name = name;
@@ -62,5 +65,6 @@ public record EmployeeDto(
         this.gender = gender;
         this.addresses = addresses != null ? addresses : new HashSet<>();
         this.document = document;
+        this.usersRole = usersRole;
     }
 }

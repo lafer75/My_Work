@@ -28,7 +28,6 @@ public class DocumentServiceBean implements DocumentService {
         document.setExpireDate(LocalDateTime.now().plusYears(5));
         Document savedDocument = documentRepository.save(document);
 
-        // Update history for document creation
         DocumentHistory history = DocumentHistory.builder()
                 .timestamp(LocalDateTime.now())
                 .document(savedDocument)
@@ -86,7 +85,6 @@ public class DocumentServiceBean implements DocumentService {
         Document document = getById(id);
         documentRepository.delete(document);
 
-        // Update history for document deletion
         DocumentHistory history = DocumentHistory.builder()
                 .timestamp(LocalDateTime.now())
                 .document(document)

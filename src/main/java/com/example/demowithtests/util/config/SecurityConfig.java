@@ -1,26 +1,25 @@
 package com.example.demowithtests.util.config;
 
+import com.example.demowithtests.service.jdbc.JdbcUserDetailsService;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class SecurityConfig {
 
     //TODO: 30-July-23 Create 2 users for demo
     @Bean
-    public UserDetailsService userDetailsService() {
-
-        var userOne = User.withUsername("user").password("{noop}password").roles("USER").build();
-        var userTwo = User.withUsername("admin").password("{noop}password").roles("USER", "ADMIN").build();
-        return new InMemoryUserDetailsManager(userOne, userTwo);
+    public UserDetailsService userDetailsService(DataSource dataSource) {
+        return new JdbcUserDetailsService(new JdbcTemplate(dataSource));
     }
 
     // TODO: 30-July-23 Secure the endpoints with HTTP Basic authentication
@@ -28,7 +27,6 @@ public class SecurityConfig {
     protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
 
         return http
-                //HTTP Basic authentication
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth

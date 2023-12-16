@@ -42,7 +42,6 @@ public class DocumentController implements DocumentResource {
     @ResponseStatus(HttpStatus.OK)
     public DocumentDto getDocumentById(@PathVariable Integer id) {
         Document document = documentService.getById(id);
-        // Convert the Document to DocumentDto
         return convertToDocumentDto(document);
     }
 
@@ -50,14 +49,12 @@ public class DocumentController implements DocumentResource {
     @ResponseStatus(HttpStatus.OK)
     public List<DocumentHistoryDto> getDocumentHistory(@PathVariable Integer id) {
         Document document = documentService.getById(id);
-        // Convert the DocumentHistory list to DocumentHistoryDto list
+
         return convertToDocumentHistoryDtoList(document.getHistory());
     }
 
-    // Helper method to convert Document to DocumentDto
+
     private DocumentDto convertToDocumentDto(Document document) {
-        // Your conversion logic here...
-        // For simplicity, assuming you have a method in DocumentDto to perform the conversion
         return new DocumentDto(
                 document.getId(),
                 document.getName(),
@@ -68,10 +65,9 @@ public class DocumentController implements DocumentResource {
         );
     }
 
-    // Helper method to convert List<DocumentHistory> to List<DocumentHistoryDto>
+
     private List<DocumentHistoryDto> convertToDocumentHistoryDtoList(List<DocumentHistory> historyList) {
-        // Your conversion logic here...
-        // For simplicity, assuming you have a method in DocumentHistoryDto to perform the conversion
+
         return historyList.stream()
                 .map(history -> new DocumentHistoryDto(
                         history.getId(),

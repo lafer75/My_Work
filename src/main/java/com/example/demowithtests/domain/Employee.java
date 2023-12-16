@@ -43,6 +43,11 @@ public final class Employee {
     @JoinColumn(name = "document_id", referencedColumnName = "id")
     private Document document;
 
+    @JsonIgnore
+    @OneToOne  (cascade = CascadeType.ALL)
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private UsersRole usersRole;
+
     @Column(name = "is_deleted")
     private Boolean is_Deleted = Boolean.FALSE;
 
