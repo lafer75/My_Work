@@ -12,6 +12,11 @@ input DepartmentRequestDto {
    organizationId: Int
 }
 
+extend type Mutation {
+   newDepartmentFill(department: DepartmentRequestDto!): Department
+   generateDepartments(count: Int!): [Department]
+}
+
 type Department {
    id: ID!
    name: String!

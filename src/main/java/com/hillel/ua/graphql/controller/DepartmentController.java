@@ -1,5 +1,6 @@
 package com.hillel.ua.graphql.controller;
 
+import com.github.javafaker.Faker;
 import com.hillel.ua.graphql.dto.DepartmentRequestDto;
 import com.hillel.ua.graphql.entities.Department;
 import com.hillel.ua.graphql.entities.Organization;
@@ -14,7 +15,11 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class DepartmentController {
@@ -31,6 +36,52 @@ public class DepartmentController {
     public Department newDepartment(@Argument DepartmentRequestDto department) {
         Organization organization = organizationRepository.findById(department.getOrganizationId()).orElseThrow(() -> new RuntimeException("Organization not found"));
         return departmentRepository.save(new Department(null, department.getName(), null, organization));
+    }
+
+    @MutationMapping
+    public List<Department> generateDepartments(@Argument(name = "count") int count) {
+        List<Department> departments = new ArrayList<>();
+        Faker faker = new Faker();
+
+        int batchSize = 1000;
+
+        List<Organization> organizations = (List<Organization>) organizationRepository.findAll();
+
+        if (organizations.isEmpty()) {
+            throw new RuntimeException("No organizations found in the database");
+        }
+
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+        for (int i = 0; i < count; i += batchSize) {
+            int finalI = i;
+            executorService.submit(() -> {
+                List<Department> batch = new ArrayList<>();
+                for (int j = finalI; j < finalI + batchSize && j < count; j++) {
+                    DepartmentRequestDto departmentDto = new DepartmentRequestDto();
+                    departmentDto.setName(faker.company().profession());
+
+                    Organization organization = organizations.get(faker.random().nextInt(organizations.size()));
+                    departmentDto.setOrganizationId(organization.getId() + 1);
+
+                    Department department = new Department(null, departmentDto.getName(), null, organization);
+                    batch.add(department);
+                }
+                List<Department> savedBatch = (List<Department>) departmentRepository.saveAll(batch);
+                synchronized (departments) {
+                    departments.addAll(savedBatch);
+                }
+            });
+        }
+
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return departments;
     }
 
     @QueryMapping

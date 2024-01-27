@@ -3,10 +3,12 @@ package com.hillel.ua.graphql.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+@Getter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,32 +25,16 @@ public class Department {
     private Organization organization;
 
 
-    public Integer getId() {
-        return id;
-    }
-
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public Set<Employee> getEmployees() {
-        return employees;
-    }
-
     public void setEmployees(Set<Employee> employees) {
         this.employees = employees;
-    }
-
-    public Organization getOrganization() {
-        return organization;
     }
 
     public void setOrganization(Organization organization) {

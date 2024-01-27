@@ -8,6 +8,11 @@ extend type Mutation {
   newEmployee(employee: EmployeeRequestDto!): Employee
 }
 
+extend type Mutation {
+  newEmployeeFill(employee: EmployeeRequestDto!): Employee
+  generateEmployees(count: Int!): [Employee]
+}
+
 input EmployeeRequestDto {
   firstName: String!
   lastName: String!
